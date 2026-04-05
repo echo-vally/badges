@@ -1,0 +1,16 @@
+🚀 Suggested Enhancements
+Cloud Sync (Firestore/Database) – Store tasks in Firebase instead of only localStorage
+Real-time Sync – Live updates across multiple devices
+Task Categories & Tags – Organize tasks with labels and filters
+Due Dates & Reminders – Notifications for upcoming deadlines
+Drag & Drop Reordering – Improve UX with sortable task lists
+Dark Mode Toggle – User theme preference support
+Offline Support (PWA) – Installable app with offline access
+Collaboration – Share tasks or lists with other users
+File Attachments – Add images or files to tasks
+Advanced Search & Filters – Filter by date, priority, tags
+Analytics Dashboard – Productivity insights (completed vs pending trends)
+Unit & Integration Tests – Add testing (e.g., Jest)
+Accessibility Improvements (a11y) – Better keyboard and screen reader support
+i18n (Multi-language Support) – Support multiple languages
+Rate Limiting & Security Rules – Secure Firebase usage
