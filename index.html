@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <!-- Auth Modal -->
+    <div class="auth-modal" id="authModal">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-tasks"></i>
+                <h2>Todo Dashboard</h2>
+                <p>Sign in to manage your tasks</p>
+            </div>
+            <div class="auth-providers">
+                <button class="auth-btn google" id="googleSignIn">
+                    <i class="fab fa-google"></i>
+                    <span>Continue with Google</span>
+                </button>
+                <button class="auth-btn github" id="githubSignIn">
+                    <i class="fab fa-github"></i>
+                    <span>Continue with GitHub</span>
+                </button>
+                <button class="auth-btn facebook" id="facebookSignIn">
+                    <i class="fab fa-facebook-f"></i>
+                    <span>Continue with Facebook</span>
+                </button>
+            </div>
+            <div class="auth-footer">
+                <p>By signing in, you agree to our Terms of Service</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+    <div class="auth-modal hidden" id="profileModal">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-user-circle"></i>
+                <h2>Edit Profile</h2>
+                <p>Customize your profile</p>
+            </div>
+            <form id="profileForm">
+                <!-- Avatar Preview -->
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-preview" id="profileAvatarPreview">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="profile-avatar-inputs">
+                        <div class="input-group-vertical">
+                            <label for="avatarFileInput" class="file-label">
+                                <i class="fas fa-upload"></i> Upload Image
+                            </label>
+                            <input type="file" id="avatarFileInput" accept="image/*" class="file-input">
+                        </div>
+                        <div class="input-group-vertical">
+                            <input type="text" id="avatarUrlInput" class="url-input" placeholder="Or paste image URL...">
+                            <button type="button" id="clearAvatarBtn" class="btn-clear-avatar">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+                    <p class="avatar-hint">Max file size: 100KB</p>
+                </div>
+
+                <!-- Display Name -->
+                <div class="input-group-vertical">
+                    <label for="profileNameInput">Display Name</label>
+                    <input type="text" id="profileNameInput" class="profile-name-input" placeholder="Your name" maxlength="50" required>
+                </div>
+
+                <!-- Buttons -->
+                <div class="profile-buttons">
+                    <button type="button" id="cancelProfileBtn" class="btn-cancel">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveProfileBtn" class="btn-save">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-tasks"></i>
+                <h1>Todo Dashboard</h1>
+            </div>
+            <div class="user-info">
+                <span class="date" id="currentDate"></span>
+                <div class="user-menu" id="userMenu" style="display: none;">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-dropdown">
+                        <div class="user-profile">
+                            <div class="user-avatar-large" id="userAvatarLarge"></div>
+                            <div class="user-details">
+                                <span class="user-name" id="userName"></span>
+                                <span class="user-email" id="userEmail"></span>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <button class="dropdown-item" id="editProfileBtn">
+                            <i class="fas fa-user-edit"></i> Edit Profile
+                        </button>
+                        <button class="dropdown-item" id="signOutBtn">
+                            <i class="fas fa-sign-out-alt"></i> Sign Out
+                        </button>
+                    </div>
+                </div>
+                <div class="auth-button" id="authButton">
+                    <i class="fas fa-user-circle"></i> Sign In
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Stats Cards -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon total">
+                        <i class="fas fa-list-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalTasks">0</h3>
+                        <p>Total Tasks</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon pending">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="pendingTasks">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon completed">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="completedTasks">0</h3>
+                        <p>Completed</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon priority">
+                        <i class="fas fa-exclamation-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="highPriorityTasks">0</h3>
+                        <p>High Priority</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Task Section -->
+            <section class="add-task-section">
+                <div class="add-task-card">
+                    <div class="input-group">
+                        <input type="text" id="taskInput" placeholder="What needs to be done?" class="task-input">
+                        <select id="prioritySelect" class="priority-select">
+                            <option value="low">Low Priority</option>
+                            <option value="medium" selected>Medium Priority</option>
+                            <option value="high">High Priority</option>
+                        </select>
+                        <button id="addTaskBtn" class="btn-add">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters and Search -->
+            <section class="controls-section">
+                <div class="filter-tabs">
+                    <button class="tab active" data-filter="all">All</button>
+                    <button class="tab" data-filter="active">Active</button>
+                    <button class="tab" data-filter="completed">Completed</button>
+                </div>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search tasks...">
+                </div>
+            </section>
+
+            <!-- Task List -->
+            <section class="tasks-section">
+                <div class="tasks-container" id="tasksContainer">
+                    <!-- Tasks will be dynamically added here -->
+                </div>
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <i class="fas fa-clipboard-list"></i>
+                    <h3>No tasks found</h3>
+                    <p>Add a new task to get started!</p>
+                </div>
+            </section>
+
+            <!-- Clear Completed -->
+            <section class="actions-section">
+                <button id="clearCompletedBtn" class="btn-clear">
+                    <i class="fas fa-trash-alt"></i> Clear Completed
+                </button>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
